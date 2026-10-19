@@ -79,7 +79,7 @@ def init_db(db_path=None):
                 ("Honda CR-V", "SUV", 3800.0, "available", "Automatic", "Hybrid", 5),
                 ("Hyundai i20", "Hatchback", 1600.0, "available", "Manual", "Petrol", 5),
                 ("Tesla Model 3", "Electric", 6000.0, "available", "Automatic", "Electric", 5),
-                ("Ford Explorer", "SUV", 4800.0, "maintenance", "Automatic", "Petrol", 7),
+                ("Ford Explorer", "SUV", 4800.0, "available", "Automatic", "Petrol", 7),
                 ("Volkswagen Golf", "Hatchback", 2200.0, "available", "Manual", "Diesel", 5)
             ]
             conn.executemany("""
