@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vehicle Rental System</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Header Navigation -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <span class="brand-badge">PBL</span>
+        <h1 class="brand-title">Vehicle Rental System</h1>
+      </div>
+      <nav class="step-indicator" aria-label="Booking steps">
+        <span class="step active" id="step-nav-1">1. Vehicles</span>
+        <span class="step-separator">›</span>
+        <span class="step" id="step-nav-2">2. Booking Form</span>
+        <span class="step-separator">›</span>
+        <span class="step" id="step-nav-3">3. Confirmation</span>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-container">
+
+    <!-- ==============================================
+         SCREEN 1: VEHICLE LISTING
+         ============================================== -->
+    <section id="screen-listing" class="screen-view active" aria-labelledby="listing-heading">
+      <div class="screen-header">
+        <div>
+          <h2 id="listing-heading">Available Vehicles</h2>
+          <p class="subtitle">Select your rental dates and choose a vehicle from the fleet.</p>
+        </div>
+      </div>
+
+      <!-- Search & Filter Controls -->
+      <div class="filter-card">
+        <div class="filter-grid">
+          
+          <!-- Pickup Date Input -->
+          <div class="form-group">
+            <label for="filter-pickup-date">Pickup Date</label>
+            <input type="date" id="filter-pickup-date" name="filterPickupDate" aria-label="Pickup Date">
+          </div>
+
+          <!-- Return Date Input -->
+          <div class="form-group">
+            <label for="filter-return-date">Return Date</label>
+            <input type="date" id="filter-return-date" name="filterReturnDate" aria-label="Return Date">
+          </div>
+
+          <!-- Vehicle Type Filter -->
+          <div class="form-group">
+            <label for="filter-type">Vehicle Type</label>
+            <select id="filter-type" name="filterType">
+              <option value="all">All Types</option>
+              <option value="Sedan">Sedan</option>
+              <option value="SUV">SUV</option>
+              <option value="Hatchback">Hatchback</option>
+              <option value="Electric">Electric</option>
+            </select>
+          </div>
+
+          <!-- Max Daily Price Filter -->
+          <div class="form-group">
+            <label for="filter-price">
+              Max Daily Price: <span id="price-display">₹8,000</span>
+            </label>
+            <input type="range" id="filter-price" name="filterPrice" min="1000" max="8000" step="200" value="8000">
+          </div>
+
+        </div>
+
+        <div class="filter-actions">
+          <button type="button" id="btn-reset-filters" class="btn btn-secondary btn-sm">Reset Filters</button>
+          <span class="results-count" id="results-count">Showing 6 vehicles</span>
+        </div>
+      </div>
+
+      <!-- Vehicle Card Grid -->
+      <div class="vehicle-grid" id="vehicle-grid">
+        <!-- Rendered dynamically by JavaScript -->
+      </div>
+    </section>
+
+    <!-- ==============================================
+         SCREEN 2: BOOKING FORM
+         ============================================== -->
+    <section id="screen-booking" class="screen-view" aria-labelledby="booking-heading">
+      <div class="screen-header">
+        <div>
+          <button type="button" id="btn-back-to-listing" class="btn-link">← Back to Vehicles</button>
+          <h2 id="booking-heading">Rental Booking Form</h2>
+          <p class="subtitle">Review the selected vehicle and provide your details to reserve.</p>
+        </div>
+      </div>
+
+      <div class="booking-layout">
+        <!-- Left Column: Selected Vehicle Summary -->
+        <div class="selected-vehicle-card">
+          <h3 class="card-title">Selected Vehicle</h3>
+          <div class="vehicle-summary-details">
+            <div class="summary-row">
+              <span class="summary-label">Vehicle</span>
+              <span class="summary-value" id="summary-vehicle-name">-</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Type</span>
+              <span class="summary-value" id="summary-vehicle-type">-</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Daily Rate</span>
+              <span class="summary-value price-highlight" id="summary-vehicle-price">₹0 / day</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Transmission / Fuel</span>
+              <span class="summary-value" id="summary-vehicle-specs">-</span>
+            </div>
+          </div>
+
+          <!-- Dynamic Cost Estimation Box -->
+          <div class="cost-estimate-card">
+            <h4>Estimated Rental Cost</h4>
+            <div class="estimate-breakdown">
+              <div class="estimate-row">
+                <span>Daily Rate</span>
+                <span id="estimate-daily-rate">₹0 / day</span>
+              </div>
+              <div class="estimate-row">
+                <span>Duration</span>
+                <span id="estimate-duration">0 days</span>
+              </div>
+              <div class="estimate-divider"></div>
+              <div class="estimate-row total-row">
+                <span>Estimated Total</span>
+                <span id="estimate-total-cost" class="total-amount">₹0</span>
+              </div>
+            </div>
+            <p class="estimate-note">* Final total calculated based on whole rental days.</p>
+          </div>
+        </div>
+
+        <!-- Right Column: Customer Details Form -->
+        <div class="booking-form-card">
+          <form id="booking-form" novalidate>
+            <h3 class="card-title">Customer Information</h3>
+
+            <!-- Customer Name -->
+            <div class="form-group">
+              <label for="cust-name">Full Name <span class="required">*</span></label>
+              <input 
+                type="text" 
+                id="cust-name" 
+                name="customerName" 
+                placeholder="e.g. John Doe" 
+                required 
+                autocomplete="name"
+              >
+              <small class="error-msg" id="err-cust-name"></small>
+            </div>
+
+            <!-- Customer Email -->
+            <div class="form-group">
+              <label for="cust-email">Email Address <span class="required">*</span></label>
+              <input 
+                type="email" 
+                id="cust-email" 
+                name="customerEmail" 
+                placeholder="e.g. john@example.com" 
+                required 
+                autocomplete="email"
+              >
+              <small class="error-msg" id="err-cust-email"></small>
+            </div>
+
+            <!-- Booking Dates Inside Form -->
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="booking-pickup-date">Pickup Date <span class="required">*</span></label>
+                <input type="date" id="booking-pickup-date" name="pickupDate" required>
+                <small class="error-msg" id="err-pickup-date"></small>
+              </div>
+
+              <div class="form-group">
+                <label for="booking-return-date">Return Date <span class="required">*</span></label>
+                <input type="date" id="booking-return-date" name="returnDate" required>
+                <small class="error-msg" id="err-return-date"></small>
+              </div>
+            </div>
+
+            <!-- Form Global Error Alert -->
+            <div id="booking-form-alert" class="alert-box alert-error hidden" role="alert"></div>
+
+            <!-- Submit Button -->
+            <div class="form-actions">
+              <button type="submit" id="btn-confirm-booking" class="btn btn-primary btn-block">
+                Confirm Booking
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================
+         SCREEN 3: BOOKING CONFIRMATION
+         ============================================== -->
+    <section id="screen-confirmation" class="screen-view" aria-labelledby="confirmation-heading">
+      <div class="confirmation-wrapper">
+        <div class="confirmation-card">
+          
+          <!-- Status Icon & Title -->
+          <div class="confirmation-header">
+            <div class="success-icon" aria-hidden="true">✓</div>
+            <h2 id="confirmation-heading">Booking Confirmed!</h2>
+            <p class="subtitle">Your reservation details have been generated successfully.</p>
+          </div>
+
+          <!-- Receipt Details -->
+          <div class="receipt-box">
+            <div class="receipt-header-row">
+              <span class="receipt-label">Booking Reference</span>
+              <span class="receipt-code" id="confirm-ref-code">VR-0000-X</span>
+            </div>
+
+            <div class="receipt-item">
+              <span class="receipt-label">Confirmation Status</span>
+              <span class="status-badge badge-confirmed" id="confirm-status">Confirmed (UI Preview)</span>
+            </div>
+
+            <div class="receipt-item">
+              <span class="receipt-label">Vehicle</span>
+              <span class="receipt-value" id="confirm-vehicle-name">-</span>
+            </div>
+
+            <div class="receipt-item">
+              <span class="receipt-label">Customer Name</span>
+              <span class="receipt-value" id="confirm-customer-name">-</span>
+            </div>
+
+            <div class="receipt-item">
+              <span class="receipt-label">Customer Email</span>
+              <span class="receipt-value" id="confirm-customer-email">-</span>
+            </div>
+
+            <div class="receipt-item">
+              <span class="receipt-label">Pickup Date</span>
+              <span class="receipt-value" id="confirm-pickup-date">-</span>
+            </div>
+
+            <div class="receipt-item">
+              <span class="receipt-label">Return Date</span>
+              <span class="receipt-value" id="confirm-return-date">-</span>
+            </div>
+
+            <div class="receipt-item">
+              <span class="receipt-label">Duration</span>
+              <span class="receipt-value" id="confirm-duration">0 days</span>
+            </div>
+
+            <div class="receipt-divider"></div>
+
+            <div class="receipt-total-row">
+              <span class="total-label">Total Cost</span>
+              <span class="total-value" id="confirm-total-cost">₹0</span>
+            </div>
+          </div>
+
+          <!-- Backend Integration Status for College PBL -->
+          <div class="student-notice" role="note">
+            <strong>College PBL System Status:</strong>
+            <p>
+              Your reservation has been validated and persisted to the SQLite database via Python Flask (<code>POST /api/bookings</code>). The backend verified vehicle availability and generated your unique reference code.
+            </p>
+          </div>
+
+          <!-- Action: Return to Screen 1 -->
+          <div class="confirmation-actions">
+            <button type="button" id="btn-return-home" class="btn btn-primary">
+              Browse More Vehicles
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <p>Vehicle Rental System &bull; College PBL Prototype</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/mockData.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
