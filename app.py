@@ -147,10 +147,15 @@ def is_vehicle_available_for_dates(conn, vehicle_id, pickup_date_str, return_dat
         SELECT COUNT(*) FROM bookings
         WHERE vehicle_id = ?
           AND status != 'Cancelled'
+          AND return_date >= ?
           AND pickup_date <= ?
           AND return_date >= ?
     """
-    overlap_cursor = conn.execute(query, (vehicle_id, return_date_str, pickup_date_str))
+    today = datetime.now().date().isoformat()
+    overlap_cursor = conn.execute(
+        query,
+        (vehicle_id, today, return_date_str, pickup_date_str),
+    )
     overlap_count = overlap_cursor.fetchone()[0]
 
     if overlap_count > 0:
@@ -218,6 +223,7 @@ def get_vehicles():
                                SELECT 1 FROM bookings b
                                WHERE b.vehicle_id = v.id
                                  AND b.status != 'Cancelled'
+                                 AND b.return_date >= ?
                                  AND b.pickup_date <= ?
                                  AND b.return_date >= ?
                            ) THEN 0
@@ -226,7 +232,10 @@ def get_vehicles():
                 FROM vehicles v
                 WHERE 1=1
             """
-            params.extend([return_date, pickup_date])
+            # Expired bookings should no longer make a vehicle unavailable,
+            # even if the page still has an old search date selected.
+            today = datetime.now().date().isoformat()
+            params.extend([today, return_date, pickup_date])
         else:
             # Base availability without date range
             sql = """
